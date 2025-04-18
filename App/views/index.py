@@ -16,10 +16,5 @@ def init():
 def health_check():
     return jsonify({'status':'healthy'})
 
-@index_views.route('/map', methods=['GET'])
-def map_page():
-    return render_template('map.html')
 
-@index_views.route('/editmap', methods=['GET'])
-def editmap_page():
-    return render_template('editmap.html')
+

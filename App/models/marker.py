@@ -8,11 +8,21 @@ class Marker(db.Model):
     faculty = db.Column(db.String(50), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
-    def __init__(self, name, latitude, longitude, faculty):
+    def __init__(self, name, latitude, longitude, faculty, user_id):
         self.name = name
         self.latitude = latitude
         self.longitude = longitude
         self.faculty = faculty
+        self.user_id = user_id
+        
+    def get_json(self):
+        return{
+            'name': self.id,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'faculty': self.faculty,
+            'user_id': self.user_id
+        }
 
     def __repr__(self):
         return f"<Marker {self.name} lat:({self.latitude}, long:{self.longitude})> category: {self.faculty}"
