@@ -36,3 +36,11 @@ def create_marker(name, lat, long, faculty, user_id):
     db.session.add(new_marker)
     db.session.commit()
     return new_marker
+
+def delete_marker(id):
+    marker = Marker.query.get(id)
+    if marker:
+        db.session.delete(marker)
+        db.session.commit()
+        return True
+    return False

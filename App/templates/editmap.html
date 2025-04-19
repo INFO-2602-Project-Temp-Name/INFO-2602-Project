@@ -7,12 +7,14 @@
 <h4>Admin View Map</h4>
 
 
-
+<!--Map API-->
 <div class="row" style="margin-top: 20px; height: 80vh;">
   <div class="col s12 m9" style="height: 100%;">
     <div id="map" style="height: 100%;"></div>
   </div>
 
+
+<!-- Filter to look at specific markers-->
   <div class="col s12 m3" style="height: 100%; overflow-y: auto;">
     <h5>Filter by Faculty</h5>
     <p>
@@ -39,8 +41,59 @@
     <p>
       <label><input type="checkbox" class="faculty-filter" value="Sport" checked /><span>Sport</span></label>
     </p>
+    <p>
+      <label><input type="checkbox" class="faculty-filter" value="Other" checked /><span>Other</span></label>
+    </p>
   </div>
 </div>
+
+<!-- Modal for Adding Marker -->
+<div id="marker-modal" class="modal">
+  <div class="modal-content">
+    <h5>Create New Marker</h5>
+    <form id="marker-form" method="POST" action="/editmap">
+      <div class="input-field">
+        <input id="name" name="name" type="text" required>
+        <label for="name">Marker Name</label>
+      </div>
+
+      <div class="input-field">
+        <select name="faculty" required>
+          <option value="" disabled selected>Select Faculty</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Science and Technology">Science and Technology</option>
+          <option value="Humanities And Education">Humanities And Education</option>
+          <option value="Law">Law</option>
+          <option value="Social Sciences">Social Sciences</option>
+          <option value="Medical Sciences">Medical Sciences</option>
+          <option value="Food and Agriculture">Food and Agriculture</option>
+          <option value="Sport">Sport</option>
+          <option value="Other">Other</option>
+        </select>
+        <label>Faculty</label>
+      </div>
+
+      <input type="hidden" id="lat-input" name="latitude">
+      <input type="hidden" id="lng-input" name="longitude">
+
+      <button type="submit" class="btn waves-effect waves-light">Create Marker</button>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="delete-marker-modal" class="modal">
+  <div class="modal-content">
+    <h5>Delete Marker</h5>
+    <p id="delete-marker-info">Are you sure you want to delete this marker?</p>
+    <form id="delete-marker-form" method="POST" action="/deletemarker">
+      <input type="hidden" name="marker_id" id="delete-marker-id">
+      <button type="submit" class="btn red darken-1">Delete</button>
+      <a href="#!" class="modal-close btn-flat">Cancel</a>
+    </form>
+  </div>
+</div>
+
 
 
 <style>
@@ -51,24 +104,28 @@
   }
 </style>
 
-<!-- Google Maps API (replace YOUR_API_KEY) -->
-<script async
+<!-- Google Maps API -->
+<script defer
   src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaYQMeyTnu_o0ugYEur6dT14atMcOjXeI&callback=initMap">
 </script>
 
+<!-- script for the Map functionality-->
 <script>
   let markers = {{ markers|tojson }};
   let map;
   let markerObjects = [];
+  let selectedMarker = null;
 
-  function initMap() {
+  async function initMap() {
     const center = { lat: 10.6396, lng: -61.3995 };
     map = new google.maps.Map(document.getElementById("map"), {
-      zoom: 16,
+      zoom: 17,
       center: center,
       styles: [
         { featureType: "poi", stylers: [{ visibility: "off" }] },
-        { featureType: "transit", stylers: [{ visibility: "off" }] }
+        { featureType: "transit", stylers: [{ visibility: "off" }] },
+        { featureType: "road", elementType: "labels", stylers: [{ visibility: "off" }] },
+        { featureType: "administrative", stylers: [{ visibility: "off" }] }
       ]
     });
 
@@ -92,10 +149,43 @@
       });
 
       marker.addListener("click", () => {
-        infoWindow.open(map, marker);
+        const modal = M.Modal.getInstance(document.getElementById("delete-marker-modal"));
+      
+        // Set hidden input value
+        document.getElementById("delete-marker-id").value = m.id;
+      
+        // Update modal text with marker name (optional)
+        document.getElementById("delete-marker-info").textContent =
+          `Are you sure you want to delete "${m.name}"?`;
+      
+        modal.open();
       });
+      
 
       markerObjects.push(marker);
+    });
+    map.addListener("click", (e) => {
+      const lat = e.latLng.lat();
+      const lng = e.latLng.lng();
+  
+      // Remove existing marker if any
+      if (selectedMarker) {
+        selectedMarker.setMap(null);
+      }
+  
+      // Create new temporary marker
+      selectedMarker = new google.maps.Marker({
+        position: { lat, lng },
+        map: map
+      });
+  
+      // Set form fields
+      document.getElementById("lat-input").value = lat;
+      document.getElementById("lng-input").value = lng;
+  
+      // Open modal
+      const modal = M.Modal.getInstance(document.getElementById("marker-modal"));
+      modal.open();
     });
 
     setupFacultyFilter();
@@ -103,23 +193,55 @@
 
   function setupFacultyFilter() {
     const checkboxes = document.querySelectorAll(".faculty-filter");
-
+  
+    // Restore saved filters from localStorage
+    const savedFilters = JSON.parse(localStorage.getItem("selectedFaculties") || "[]");
+  
+    if (savedFilters.length > 0) {
+      checkboxes.forEach(cb => {
+        cb.checked = savedFilters.includes(cb.value);
+      });
+    }
+  
+    // Apply initial filter on load
+    applyFilter();
+  
     checkboxes.forEach(checkbox => {
       checkbox.addEventListener("change", () => {
         const selected = Array.from(checkboxes)
                               .filter(cb => cb.checked)
                               .map(cb => cb.value);
-
-        markerObjects.forEach(marker => {
-          if (selected.includes(marker.faculty)) {
-            marker.setMap(map);
-          } else {
-            marker.setMap(null);
-          }
-        });
+  
+        // Save selected faculties to localStorage
+        localStorage.setItem("selectedFaculties", JSON.stringify(selected));
+  
+        applyFilter();
       });
     });
   }
-</script>
+  
+  function applyFilter() {
+    const selected = JSON.parse(localStorage.getItem("selectedFaculties") || "[]");
+  
+    markerObjects.forEach(marker => {
+      if (selected.includes(marker.faculty)) {
+        marker.setMap(map);
+      } else {
+        marker.setMap(null);
+      }
+    });
+  }
+  
 
+  
+</script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var selects = document.querySelectorAll('select');
+    M.FormSelect.init(selects);
+
+    var modals = document.querySelectorAll('.modal');
+    M.Modal.init(modals);
+  });
+</script>
 {% endblock %}
