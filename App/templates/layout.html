@@ -14,12 +14,11 @@
   </head>
   <body>
     
-      <nav class="purple">
+      <nav class="teal">
           <div class="nav-wrapper">
               <a href="#!" class="brand-logo center">{% block page %}{% endblock %}</a>
               <ul id="nav-mobile" class="left">
                   <li><a href="/">Home</a></li>
-                  <li><a href="/map">Map</a></li>
                   {% if is_authenticated %}
                   <li><a href="/editmap">Edit Map</a></li>
                   <li><a href="/users">Users Jinja</a></li>
@@ -40,7 +39,7 @@
                       <input placeholder="password"value="bobpass" name="password" type="password" class="validate" required>
                       <label for="password">Password</label>
                   </div>
-                  <button type="submit" class="btn waves-effect waves-light">Login</button>
+                  <button type="submit" class="light-blue btn waves-effect waves-light">Login</button>
               </form>
               {% endif %}
               

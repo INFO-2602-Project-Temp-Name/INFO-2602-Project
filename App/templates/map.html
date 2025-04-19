@@ -63,11 +63,22 @@
   let markers = {{ markers|tojson }};
   let map;
   let markerObjects = [];
+  const facultyColors = {
+    "Engineering": "red",
+    "Science and Technology": "blue",
+    "Humanities And Education": "purple",
+    "Law": "orange",
+    "Social Sciences": "green",
+    "Medical Sciences": "teal",
+    "Food and Agriculture": "brown",
+    "Sport": "pink",
+    "Other": "grey"
+  };
 
   function initMap() {
     const center = { lat: 10.6396, lng: -61.3995 };
     map = new google.maps.Map(document.getElementById("map"), {
-      zoom: 16,
+      zoom: 17,
       center: center,
       styles: [
         { featureType: "poi", stylers: [{ visibility: "off" }] },
@@ -79,15 +90,25 @@
 
     // Create markers and store them
     markers.forEach(m => {
+      const color = facultyColors[m.faculty] || "gray";
+    
       const marker = new google.maps.Marker({
         position: { lat: m.latitude, lng: m.longitude },
         map: map,
         title: m.name,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: color,
+          fillOpacity: 1,
+          strokeWeight: 1,
+          strokeColor: "white"
+        },
         label: {
           text: m.name,
           fontSize: "12px",
           fontWeight: "bold"
-        },
+        }
       });
 
       marker.faculty = m.faculty; // attach faculty info to the marker
