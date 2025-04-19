@@ -17,3 +17,4 @@ map_views = Blueprint('map_views', __name__, template_folder='../templates')
 def map_page():
     markers = get_all_markers_json()
     return render_template('map.html',markers = markers)
+
