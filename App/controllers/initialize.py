@@ -6,7 +6,7 @@ def initialize():
     db.drop_all()
     db.create_all()
     create_user('bob', 'bobpass')
-    create_marker('uwi1',10.6398,-61.3997,'Engineering',1)
-    create_marker('uwi2',10.6394,-61.3993,'Engineering',1)
-    create_marker('This is a long name',10.6390,-61.3990,'Engineering',1)
+    create_marker('Eng',10.6398,-61.3997,'Engineering',1)
+    create_marker('FST',10.6394,-61.3993,'Science and Technology',1)
+    create_marker('Law',10.6390,-61.3990,'Law',1)
 
