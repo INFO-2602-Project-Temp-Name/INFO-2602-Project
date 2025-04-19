@@ -2,10 +2,9 @@
 # explicitly instead of using *
 from .user import user_views
 from .index import index_views
-from .map import map_views
 from .auth import auth_views
 from .admin import setup_admin
 
 
-views = [user_views, index_views, auth_views,map_views] 
+views = [user_views, index_views, auth_views] 
 # blueprints must be added to this list
