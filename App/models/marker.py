@@ -17,7 +17,8 @@ class Marker(db.Model):
         
     def get_json(self):
         return{
-            'name': self.id,
+            'id': self.id,
+            'name': self.name,
             'latitude': self.latitude,
             'longitude': self.longitude,
             'faculty': self.faculty,

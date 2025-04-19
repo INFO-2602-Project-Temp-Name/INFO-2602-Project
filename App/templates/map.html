@@ -22,7 +22,7 @@
 
 <script>
   let markers = {{ markers|tojson }};
-  
+
   function initMap() {
       const center = { lat: 10.6396, lng: -61.3995 };
       const map = new google.maps.Map(document.getElementById("map"), {
@@ -31,12 +31,27 @@
       });
 
       markers.forEach(m => {
-          new google.maps.Marker({
-              position: { lat: m.latitude, lng: m.longitude },
-              map,
-              title: m.name,
-          });
-      });
+        const marker = new google.maps.Marker({
+            position: { lat: m.latitude, lng: m.longitude },
+            map,
+            label: {
+                text: m.name,
+                fontSize: "12px",
+                fontWeight: "bold"
+            },
+            title: m.name
+        });
+    
+        const infoWindow = new google.maps.InfoWindow({
+            content: `<strong>${m.name}</strong>`
+        });
+    
+        marker.addListener("click", () => {
+            infoWindow.open(map, marker);
+        });
+    });
+    
   }
 </script>
+
 {% endblock %}
