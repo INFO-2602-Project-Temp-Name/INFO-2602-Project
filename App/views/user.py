@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, current_user as jwt_current_user
 
 from.index import index_views
 from App.controllers.marker import *
+from App.controllers.user import create_marker,delete_marker
 
 from App.controllers import (
     create_user,
@@ -45,3 +46,22 @@ def static_user_page():
 def editmap_page():
     markers = get_all_markers_json()
     return render_template('editmap.html',markers=markers)
+
+@user_views.route('/editmap', methods=['POST'])
+@jwt_required()
+def editmap_action():
+    data = request.form
+    flash(f"Marker {data['name']} created!")
+    create_marker(data['name'], data['latitude'], data['longitude'], data['faculty'], jwt_current_user.id)
+    return redirect(url_for('user_views.editmap_page'))
+
+@user_views.route('/deletemarker', methods=['POST'])
+@jwt_required()
+def deletemap_action():
+    marker_id = request.form['marker_id']
+    if marker_id:
+        delete_marker(marker_id)
+        flash(f"Marker {marker_id} deleted!")
+    else:
+        flash("Marker ID not provided!")
+    return redirect(url_for('user_views.editmap_page'))
