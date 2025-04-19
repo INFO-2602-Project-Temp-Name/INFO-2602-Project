@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, jsonify, request, send_from_direct
 from flask_jwt_extended import jwt_required, current_user as jwt_current_user
 
 from.index import index_views
+from App.controllers.marker import *
 
 from App.controllers import (
     create_user,
@@ -38,3 +39,9 @@ def create_user_endpoint():
 @user_views.route('/static/users', methods=['GET'])
 def static_user_page():
   return send_from_directory('static', 'static-user.html')
+
+@user_views.route('/editmap', methods=['GET'])
+@jwt_required()
+def editmap_page():
+    markers = get_all_markers_json()
+    return render_template('editmap.html',markers=markers)

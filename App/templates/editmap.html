@@ -1,0 +1,125 @@
+{% extends "layout.html" %}
+
+{% block title %}UWI STA Map{% endblock %}
+{% block page %}Campus Map{% endblock %}
+
+{% block content %}
+<h4>Admin View Map</h4>
+
+
+
+<div class="row" style="margin-top: 20px; height: 80vh;">
+  <div class="col s12 m9" style="height: 100%;">
+    <div id="map" style="height: 100%;"></div>
+  </div>
+
+  <div class="col s12 m3" style="height: 100%; overflow-y: auto;">
+    <h5>Filter by Faculty</h5>
+    <p>
+      <label><input type="checkbox" class="faculty-filter" value="Engineering" checked /><span>Engineering</span></label>
+    </p>
+    <p>
+      <label><input type="checkbox" class="faculty-filter" value="Science and Technology" checked /><span>Science and Technology</span></label>
+    </p>
+    <p>
+      <label><input type="checkbox" class="faculty-filter" value="Humanities And Education" checked /><span>Humanities And Education</span></label>
+    </p>
+    <p>
+      <label><input type="checkbox" class="faculty-filter" value="Law" checked /><span>Law</span></label>
+    </p>
+    <p>
+      <label><input type="checkbox" class="faculty-filter" value="Social Sciences" checked /><span>Social Sciences</span></label>
+    </p>
+    <p>
+      <label><input type="checkbox" class="faculty-filter" value="Medical Sciences" checked /><span>Medical Sciences</span></label>
+    </p>
+    <p>
+      <label><input type="checkbox" class="faculty-filter" value="Food and Agriculture" checked /><span>Food and Agriculture</span></label>
+    </p>
+    <p>
+      <label><input type="checkbox" class="faculty-filter" value="Sport" checked /><span>Sport</span></label>
+    </p>
+  </div>
+</div>
+
+
+<style>
+  #map {
+    height: 80vh;
+    width: 100%;
+    margin-top: 20px;
+  }
+</style>
+
+<!-- Google Maps API (replace YOUR_API_KEY) -->
+<script async
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDaYQMeyTnu_o0ugYEur6dT14atMcOjXeI&callback=initMap">
+</script>
+
+<script>
+  let markers = {{ markers|tojson }};
+  let map;
+  let markerObjects = [];
+
+  function initMap() {
+    const center = { lat: 10.6396, lng: -61.3995 };
+    map = new google.maps.Map(document.getElementById("map"), {
+      zoom: 16,
+      center: center,
+      styles: [
+        { featureType: "poi", stylers: [{ visibility: "off" }] },
+        { featureType: "transit", stylers: [{ visibility: "off" }] }
+      ]
+    });
+
+    // Create markers and store them
+    markers.forEach(m => {
+      const marker = new google.maps.Marker({
+        position: { lat: m.latitude, lng: m.longitude },
+        map: map,
+        title: m.name,
+        label: {
+          text: m.name,
+          fontSize: "12px",
+          fontWeight: "bold"
+        },
+      });
+
+      marker.faculty = m.faculty; // attach faculty info to the marker
+
+      const infoWindow = new google.maps.InfoWindow({
+        content: `<strong>${m.name}</strong>`
+      });
+
+      marker.addListener("click", () => {
+        infoWindow.open(map, marker);
+      });
+
+      markerObjects.push(marker);
+    });
+
+    setupFacultyFilter();
+  }
+
+  function setupFacultyFilter() {
+    const checkboxes = document.querySelectorAll(".faculty-filter");
+
+    checkboxes.forEach(checkbox => {
+      checkbox.addEventListener("change", () => {
+        const selected = Array.from(checkboxes)
+                              .filter(cb => cb.checked)
+                              .map(cb => cb.value);
+
+        markerObjects.forEach(marker => {
+          if (selected.includes(marker.faculty)) {
+            marker.setMap(map);
+          } else {
+            marker.setMap(null);
+          }
+        });
+      });
+    });
+  }
+</script>
+
+{% endblock %}

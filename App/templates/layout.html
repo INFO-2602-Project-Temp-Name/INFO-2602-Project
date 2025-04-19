@@ -20,10 +20,11 @@
               <ul id="nav-mobile" class="left">
                   <li><a href="/">Home</a></li>
                   <li><a href="/users">Users Jinja</a></li>
+                  <li><a href="/map">Google Maps</a></li>
                   {% if is_authenticated %}
-                    <li><a href="/identify">Identify</a></li>
+                  <li><a href="/identify">Identify</a></li>
+                  <li><a href="/editmap">Edit Map</a></li>
                   {% endif %}
-                  <li><a href="/static/users">Users JS</a></li>
               </ul>
               {% if is_authenticated %}
               <ul id="nav-mobile" class="right">
