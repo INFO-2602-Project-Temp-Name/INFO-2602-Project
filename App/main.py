@@ -3,6 +3,7 @@ from flask import Flask, render_template
 from flask_uploads import DOCUMENTS, IMAGES, TEXT, UploadSet, configure_uploads
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
+from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.datastructures import  FileStorage
 
 
@@ -36,5 +37,6 @@ def create_app(overrides={}):
     @jwt.unauthorized_loader
     def custom_unauthorized_response(error):
         return render_template('401.html', error=error), 401
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
     app.app_context().push()
     return app
