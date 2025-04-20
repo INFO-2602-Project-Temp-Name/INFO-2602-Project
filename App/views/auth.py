@@ -34,12 +34,14 @@ def identify_page():
 def login_action():
     data = request.form
     token = login(data['username'], data['password'])
-    response = redirect(url_for('user_views.editmap_page'))
+
     if not token:
-        flash('Bad username or password given'), 401
-    else:
-        flash('Login Successful')
-        set_access_cookies(response, token) 
+        flash('Bad username or password given', 'error')
+        return redirect(url_for('auth_views.login_page'))
+
+    response = redirect(url_for('user_views.editmap_page'))
+    set_access_cookies(response, token)
+    flash('Login Successful', 'success')
     return response
 
 @auth_views.route('/logout', methods=['GET'])
