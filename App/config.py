@@ -18,5 +18,7 @@ def load_config(app, overrides):
     app.config['FLASK_ADMIN_SWATCH'] = 'darkly'
     app.config["SESSION_COOKIE_SECURE"] = True
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    app.config['JWT_COOKIE_SAMESITE'] = 'Lax' 
+
     for key in overrides:
         app.config[key] = overrides[key]
