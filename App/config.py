@@ -6,6 +6,7 @@ def load_config(app, overrides):
     else:
         app.config.from_object('App.default_config')
     app.config.from_prefixed_env()
+    
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.config['PREFERRED_URL_SCHEME'] = 'https'
