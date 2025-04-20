@@ -39,7 +39,8 @@ def login_action():
         flash('Bad username or password given', 'error')
         return redirect(request.referrer)
 
-    response = redirect(url_for('user_views.editmap_page'))
+    response = redirect(request.referrer)
+    # response = redirect(url_for('user_views.editmap_page'))
     set_access_cookies(response, token)
     flash('Login Successful', 'success')
     return response
