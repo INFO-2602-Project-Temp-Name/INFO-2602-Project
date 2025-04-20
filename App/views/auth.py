@@ -37,7 +37,7 @@ def login_action():
 
     if not token:
         flash('Bad username or password given', 'error')
-        return redirect(url_for('auth_views.login_page'))
+        return redirect(request.referrer)
 
     response = redirect(url_for('user_views.editmap_page'))
     set_access_cookies(response, token)
