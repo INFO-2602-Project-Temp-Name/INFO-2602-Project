@@ -5,7 +5,20 @@
 
 {% block content %}
 <h4>Public View Map</h4>
+<div class="card-panel grey lighten-5 z-depth-1" style="margin-top: 20px; border-radius: 10px;">
+  <h5 class="purple-text text-darken-4">Welcome to the UWI Public Map View</h5>
+  <p class="note"> Use the map below to explore building locations across campus. You can filter by faculty using the dropdown menu. Click on a marker to see more details about that location.</p>
+  
+<div class="card-panel grey lighten-5 z-depth-1" style="margin-top: 20px; border-radius: 10px;">
+  <h5 class="purple-text text-darken-4">Note:</h5>
+  <p class="note">This is a public view of the map. If you are an admin, please log in to access the admin features.</p>
 
+  <div class="input-field" style="margin-top: 20px;">
+    <input type="text" id="search-input" placeholder="Search for a building...">
+    <button class="btn purple" onclick="searchMarker()">Go</button>
+  </div>
+  <p class="note">To search for a specific marker, type its name in the search box and click "Go".</p>  
+  
 
 
 <div class="row" style="margin-top: 20px; height: 80vh;">
@@ -51,6 +64,7 @@
     height: 80vh;
     width: 100%;
     margin-top: 20px;
+  
   }
 </style>
 
@@ -90,43 +104,43 @@
 
     // Create markers and store them
     markers.forEach(m => {
-      const color = facultyColors[m.faculty] || "gray";
-    
-      const marker = new google.maps.Marker({
-        position: { lat: m.latitude, lng: m.longitude },
-        map: map,
-        title: m.name,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: color,
-          fillOpacity: 1,
-          strokeWeight: 1,
-          strokeColor: "white"
-        },
-        label: {
-          text: m.name,
-          fontSize: "12px",
-          fontWeight: "bold"
-        }
-      });
+  const color = facultyColors[m.faculty] || "gray";
 
-      marker.faculty = m.faculty; // attach faculty info to the marker
+  const marker = new google.maps.Marker({
+    position: { lat: m.latitude, lng: m.longitude },
+    map: map,
+    title: m.name,
+    icon: {
+      path: google.maps.SymbolPath.CIRCLE,
+      scale: 8,
+      fillColor: color,
+      fillOpacity: 1,
+      strokeWeight: 1,
+      strokeColor: "white"
+    },
+    label: {
+      text: m.name,
+      fontSize: "12px",
+      fontWeight: "bold"
+    }
+  });
 
-      const infoWindow = new google.maps.InfoWindow({
-        content: `<strong>${m.name}</strong>`
-      });
+  marker.faculty = m.faculty;
+  marker.buildingName = m.name.toLowerCase();
 
-      marker.addListener("click", () => {
-        infoWindow.open(map, marker);
-      });
+  const infoWindow = new google.maps.InfoWindow({
+    content: `<strong>${m.name}</strong>`
+  });
 
-      markerObjects.push(marker);
-    });
+  marker.addListener("click", () => {
+    infoWindow.open(map, marker);
+  });
+
+  markerObjects.push(marker);
+});
 
     setupFacultyFilter();
   }
-
   function setupFacultyFilter() {
     const checkboxes = document.querySelectorAll(".faculty-filter");
 
@@ -146,6 +160,28 @@
       });
     });
   }
+
+  function searchMarker() {
+  const input = document.getElementById("search-input").value.toLowerCase();
+  let found = false;
+
+  for (let i = 0; i < markerObjects.length; i++) {
+    if (markerObjects[i].buildingName.includes(input)) {
+      map.setCenter(markerObjects[i].getPosition());
+      map.setZoom(19);
+      new google.maps.InfoWindow({
+        content: `<strong>${markerObjects[i].getTitle()}</strong>`
+      }).open(map, markerObjects[i]);
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    M.toast({ html: 'Building not found. Please check the name.' });
+  }
+}
+
 </script>
 
 {% endblock %}

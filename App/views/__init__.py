@@ -8,3 +8,6 @@ from .admin import setup_admin
 
 views = [user_views, index_views, auth_views] 
 # blueprints must be added to this list
+from .home import home_views
+
+views = [user_views, index_views, auth_views, home_views]

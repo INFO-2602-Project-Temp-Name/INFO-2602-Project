@@ -4,7 +4,12 @@
 {% block page %}Campus Map{% endblock %}
 
 {% block content %}
+
 <h4>Admin View Map</h4>
+<p class="note">
+  <strong>Note:</strong> To edit a marker, click on a <span style="color: grey;">grey marker</span>.
+  To add a new marker, click directly on the map at the desired location.
+</p>
 
 
 <!--Map API-->
@@ -76,7 +81,8 @@
       <input type="hidden" id="lat-input" name="latitude">
       <input type="hidden" id="lng-input" name="longitude">
 
-      <button type="submit" class="btn waves-effect waves-light">Create Marker</button>
+      <button type="submit" class="btn create-marker-btn waves-effect waves-light">Create Marker</button>
+
     </form>
   </div>
 </div>
@@ -97,10 +103,54 @@
 
 
 <style>
-  #map {
-    height: 80vh;
-    width: 100%;
-    margin-top: 20px;
+  .create-marker-btn {
+  background-color: #d599e1; 
+  color: white;
+  border: none; 
+  padding: 10px 20px; 
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  width: 100%; 
+  text-align: center;
+}
+
+.create-marker-btn:hover {
+  background-color: #7341d8;
+}
+#map {
+  height: 80vh;
+  width: 100%;
+  margin-top: 20px;
+  border: 4px solid #6d2e7b; 
+  border-radius: 10px;     
+  box-shadow: 0 4px 8px rgba(185, 66, 208, 0.2);
+  .note {
+    background-color: #f9f9f9;
+    border-left: 5px solid #ccc;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
+  }
+
+  .note span {
+    font-weight: bold;
+
+
+  body {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+  }
+
+  .note {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-left: 5px solid #ccc;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-size: 14px;
   }
 </style>
 
