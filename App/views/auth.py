@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify, request, flash, send_from_directory, flash, redirect, url_for
+from flask import Blueprint, make_response, render_template, jsonify, request, flash, send_from_directory, flash, redirect, url_for
 from flask_jwt_extended import jwt_required, current_user, unset_jwt_cookies, set_access_cookies
 
 from App.controllers.user import get_all_users
@@ -39,7 +39,14 @@ def login_action():
         flash('Bad username or password given', 'error')
         return redirect(request.referrer)
 
-    response = redirect(request.referrer)
+    # response = redirect(request.referrer)
+    #testing start
+    response = make_response(f"""
+        <h2>Logged in.</h2>
+        <p>access_token set. Token = {token}</p>
+        <a href="/">Go to map</a>
+    """)
+    #testing end
     # response = redirect(url_for('user_views.editmap_page'))
     set_access_cookies(response, token)
     flash('Login Successful', 'success')
