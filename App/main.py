@@ -37,19 +37,5 @@ def create_app(overrides={}):
     @jwt.unauthorized_loader
     def custom_unauthorized_response(error):
         return render_template('401.html', error=error), 401
-    #testing start
-    from flask_jwt_extended import verify_jwt_in_request_optional, get_jwt_identity
-    @app.context_processor
-    def inject_user():
-        try:
-            verify_jwt_in_request_optional()
-            user_id = get_jwt_identity()
-            print(f"[Context Processor] Logged in as user ID: {user_id}")
-            return {'logged_in_user_id': user_id}
-        except Exception as e:
-            print("[Context Processor] JWT missing or invalid:", e)
-            return {'logged_in_user_id': None}
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1, x_host=1)
-    #testing end
     app.app_context().push()
     return app

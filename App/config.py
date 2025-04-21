@@ -15,8 +15,5 @@ def load_config(app, overrides):
     app.config["JWT_COOKIE_SECURE"] = True
     app.config["JWT_COOKIE_CSRF_PROTECT"] = False
     app.config['FLASK_ADMIN_SWATCH'] = 'darkly'
-    # Added to try for a fix for render
-    app.config["JWT_COOKIE_SECURE"] = True
-    app.config["SESSION_COOKIE_SECURE"] = True
     for key in overrides:
         app.config[key] = overrides[key]

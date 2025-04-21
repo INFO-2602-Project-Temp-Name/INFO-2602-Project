@@ -39,15 +39,7 @@ def login_action():
         flash('Bad username or password given', 'error')
         return redirect(request.referrer)
 
-    # response = redirect(request.referrer)
-    #testing start
-    response = make_response(f"""
-        <h2>Logged in.</h2>
-        <p>access_token set. Token = {token}</p>
-        <a href="/">Go to map</a>
-    """)
-    #testing end
-    # response = redirect(url_for('user_views.editmap_page'))
+    response = redirect(request.referrer)
     set_access_cookies(response, token)
     flash('Login Successful', 'success')
     return response

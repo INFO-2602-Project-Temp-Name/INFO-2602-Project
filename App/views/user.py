@@ -30,7 +30,7 @@ def create_user_action():
 
 
 @user_views.route('/editmap', methods=['GET'])
-@jwt_required()
+@jwt_required(optional=True)
 def editmap_page():
     markers = get_all_markers_json()
     return render_template('editmap.html',markers=markers)
