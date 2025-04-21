@@ -15,5 +15,9 @@ def load_config(app, overrides):
     app.config["JWT_COOKIE_SECURE"] = True
     app.config["JWT_COOKIE_CSRF_PROTECT"] = False
     app.config['FLASK_ADMIN_SWATCH'] = 'darkly'
+
+    if 'DATABASE_URL' in os.environ:
+        app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL'].replace("postgres://", "postgresql://")
+
     for key in overrides:
         app.config[key] = overrides[key]
