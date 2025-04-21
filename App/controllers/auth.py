@@ -1,25 +1,44 @@
-from flask import g
-from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
-from App.models import User  # Adjust based on your app's model import
+from flask_jwt_extended import create_access_token, jwt_required, JWTManager, get_jwt_identity, verify_jwt_in_request
 
+from App.models import User
+
+def login(username, password):
+  user = User.query.filter_by(username=username).first()
+  if user and user.check_password(password):
+    return create_access_token(identity=username)
+  return None
+
+
+def setup_jwt(app):
+  jwt = JWTManager(app)
+
+  # configure's flask jwt to resolve get_current_identity() to the corresponding user's ID
+  @jwt.user_identity_loader
+  def user_identity_lookup(identity):
+    user = User.query.filter_by(username=identity).one_or_none()
+    if user:
+        return user.id
+    return None
+
+  @jwt.user_lookup_loader
+  def user_lookup_callback(_jwt_header, jwt_data):
+    identity = jwt_data["sub"]
+    return User.query.get(identity)
+
+  return jwt
+
+
+# Context processor to make 'is_authenticated' available to all templates
 def add_auth_context(app):
-    @app.before_request
-    def load_current_user():
-        """
-        Load the current user for each request based on JWT.
-        """
-        try:
-            verify_jwt_in_request()  # Verify JWT is present in the request
-            username = get_jwt_identity()  # Get the username from the JWT
-            g.current_user = User.query.filter_by(username=username).first()  # Query the user by username
-        except Exception as e:
-            g.current_user = None  # If no JWT or error, set current_user to None
-            print(f"Error loading current user: {e}")
-
-    @app.context_processor
-    def inject_user():
-        """
-        Inject 'is_authenticated' and 'current_user' into the templates.
-        """
-        is_authenticated = g.current_user is not None  # Check if a user is loaded
-        return dict(is_authenticated=is_authenticated, current_user=g.current_user)
+  @app.context_processor
+  def inject_user():
+      try:
+          verify_jwt_in_request()
+          user_id = get_jwt_identity()
+          current_user = User.query.get(user_id)
+          is_authenticated = True
+      except Exception as e:
+          print(e)
+          is_authenticated = False
+          current_user = None
+      return dict(is_authenticated=is_authenticated, current_user=current_user)
